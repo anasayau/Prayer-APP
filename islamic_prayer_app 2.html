@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Prières</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="light-content">
+    <meta name="apple-mobile-web-app-title" content="Prières">
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --accent-blue: #007AFF;
+            --accent-green: #30D158;
+            --text-primary: rgba(255, 255, 255, 0.95);
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-tertiary: rgba(255, 255, 255, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+            background: linear-gradient(135deg, 
+                #667eea 0%, 
+                #764ba2 25%, 
+                #f093fb 50%, 
+                #f5576c 75%, 
+                #4facfe 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .app-container {
+            max-width: 414px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        .status-bar {
+            height: 54px;
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 0.5px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .status-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .app-icon {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, #5856D6 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+        }
+
+        .app-title {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.4px;
+        }
+
+        .content {
+            padding: 24px 20px 120px 20px;
+        }
+
+        .section {
+            display: none;
+            animation: slideInUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--glass-shadow);
+            margin-bottom: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        }
+
+        .card-header {
+            padding: 24px 24px 16px 24px;
+            border-bottom: 0.5px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card-title {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card-subtitle {
+            font-size: 15px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .input-group {
+            padding: 20px 24px 24px 24px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            font-size: 17px;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+        }
+
+        .input-field::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .vision-button {
+            width: 100%;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, #5856D6 100%);
+            border: none;
+            border-radius: 16px;
+            font-size: 17px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            margin-bottom: 12px;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .vision-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .vision-button:hover::before {
+            left: 100%;
+        }
+
+        .vision-button:active {
+            transform: scale(0.98);
+        }
+
+        .vision-button.secondary {
+            background: linear-gradient(135deg, var(--accent-green) 0%, #32D74B 100%);
+        }
+
+        .prayer-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(40px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--glass-shadow);
+        }
+
+        .prayer-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 0.5px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .prayer-item:last-child {
+            border-bottom: none;
+        }
+
+        .prayer-item.current {
+            background: linear-gradient(135deg, rgba(0, 122, 255, 0.15) 0%, rgba(88, 86, 214, 0.15) 100%);
+        }
+
+        .prayer-item.current::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, #5856D6 100%);
+            border-radius: 0 2px 2px 0;
+        }
+
+        .prayer-name {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+
+        .prayer-time {
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, #5856D6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .current-time-display {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .qibla-container {
+            text-align: center;
+            padding: 32px 24px;
+        }
+
+        .compass-wrapper {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 32px auto;
+        }
+
+        .compass {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            position: relative;
+            box-shadow: 
+                0 0 60px rgba(0, 122, 255, 0.2),
+                inset 0 0 60px rgba(255, 255, 255, 0.1);
+        }
+
+        .compass-rings {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .compass-rings::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+        }
+
+        .compass-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 16px;
+            height: 16px;
+            background: radial-gradient(circle, var(--accent-blue) 0%, #5856D6 100%);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(0, 122, 255, 0.5);
+            z-index: 3;
+        }
+
+        .compass-arrow {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 120px;
+            background: linear-gradient(to bottom, 
+                #FF3B30 0%, 
+                #FF3B30 60%, 
+                rgba(255, 255, 255, 0.8) 60%, 
+                rgba(255, 255, 255, 0.8) 100%);
+            border-radius: 3px;
+            transform-origin: bottom center;
+            transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 0 20px rgba(255, 59, 48, 0.4);
+        }
+
+        .direction-labels {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+
+        .direction {
+            position: absolute;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .direction.north { top: 15px; left: 50%; transform: translateX(-50%); }
+        .direction.south { bottom: 15px; left: 50%; transform: translateX(-50%); }
+        .direction.east { right: 15px; top: 50%; transform: translateY(-50%); }
+        .direction.west { left: 15px; top: 50%; transform: translateY(-50%); }
+
+        .dhikr-container {
+            text-align: center;
+            padding: 32px 24px;
+        }
+
+        .dhikr-display {
+            font-size: 84px;
+            font-weight: 100;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, #5856D6 50%, #FF3B30 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 40px 0;
+            transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            text-shadow: 0 0 40px rgba(0, 122, 255, 0.3);
+        }
+
+        .dhikr-button {
+            width: 180px;
+            height: 180px;
+            border-radius: 90px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, #5856D6 100%);
+            border: none;
+            color: white;
+            font-size: 36px;
+            cursor: pointer;
+            margin: 24px auto;
+            display: block;
+            box-shadow: 
+                0 20px 60px rgba(0, 122, 255, 0.4),
+                0 0 40px rgba(88, 86, 214, 0.3);
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dhikr-button::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            transition: opacity 0.3s;
+            opacity: 0;
+        }
+
+        .dhikr-button:hover::before {
+            opacity: 1;
+        }
+
+        .dhikr-button:active {
+            transform: scale(0.95);
+        }
+
+        .duas-container {
+            max-height: 500px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-right: 4px;
+        }
+
+        .duas-container::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .duas-container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+        }
+
+        .duas-container::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, #5856D6 100%);
+            border-radius: 2px;
+        }
+
+        .dua-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .dua-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .dua-arabic {
+            font-size: 20px;
+            line-height: 1.8;
+            text-align: right;
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 16px;
+            direction: rtl;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .dua-translation {
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 414px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border-top: 0.5px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            padding: 12px 0 34px 0;
+            z-index: 100;
+        }
+
+        .tab-button {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 12px;
+            background: none;
+            border: none;
+            color: var(--text-tertiary);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+        }
+
+        .tab-button.active {
+            color: var(--accent-blue);
+        }
+
+        .tab-button.active::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 32px;
+            height: 2px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, #5856D6 100%);
+            border-radius: 1px;
+        }
+
+        .tab-icon {
+            font-size: 26px;
+            margin-bottom: 4px;
+            filter: drop-shadow(0 0 8px rgba(0, 122, 255, 0.3));
+        }
+
+        .loading-container {
+            text-align: center;
+            padding: 60px 24px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            border-top: 3px solid var(--accent-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+            box-shadow: 0 0 20px rgba(0, 122, 255, 0.3);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .status-message {
+            text-align: center;
+            padding: 60px 24px;
+            color: var(--text-secondary);
+            font-size: 17px;
+            font-weight: 500;
+        }
+
+        .scale-pulse {
+            animation: scalePulse 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        @keyframes scalePulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @media (max-width: 375px) {
+            .compass-wrapper {
+                width: 260px;
+                height: 260px;
+            }
+            
+            .dhikr-button {
+                width: 160px;
+                height: 160px;
+            }
+            
+            .dhikr-display {
+                font-size: 72px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="status-bar">
+            <div class="status-content">
+                <div class="app-icon">☪</div>
+                <div class="app-title">Prières</div>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Section Horaires -->
+            <div id="prayers-section" class="section active">
+                <div class="glass-card">
+                    <div class="card-header">
+                        <div class="card-title">Horaires de Prière</div>
+                        <div class="card-subtitle">Trouvez vos horaires de prière quotidiens</div>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="locationInput" class="input-field" placeholder="Entrez votre ville (ex: Paris, France)">
+                        <button class="vision-button secondary" onclick="getCurrentLocation()">📍 Utiliser ma position</button>
+                        <button class="vision-button" onclick="getPrayerTimes()">Obtenir les horaires</button>
+                    </div>
+                </div>
+
+                <div id="prayerTimesContainer" style="display: none;">
+                    <div class="prayer-container" id="prayerTimesList"></div>
+                    <div class="current-time-display" id="currentTime"></div>
+                </div>
+            </div>
+
+            <!-- Section Qibla -->
+            <div id="qibla-section" class="section">
+                <div class="glass-card">
+                    <div class="card-header">
+                        <div class="card-title">Direction de la Qibla</div>
+                        <div class="card-subtitle">Trouvez la direction sacrée vers La Mecque</div>
+                    </div>
+                    <div class="qibla-container">
+                        <div class="compass-wrapper">
+                            <div class="compass">
+                                <div class="compass-rings"></div>
+                                <div class="direction-labels">
+                                    <div class="direction north">N</div>
+                                    <div class="direction south">S</div>
+                                    <div class="direction east">E</div>
+                                    <div class="direction west">O</div>
+                                </div>
+                                <div class="compass-arrow" id="qiblaArrow"></div>
+                                <div class="compass-center"></div>
+                            </div>
+                        </div>
+                        <button class="vision-button" onclick="findQibla()">🧭 Localiser la Qibla</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Dhikr -->
+            <div id="dhikr-section" class="section">
+                <div class="glass-card">
+                    <div class="card-header">
+                        <div class="card-title">Compteur de Dhikr</div>
+                        <div class="card-subtitle">Comptez vos invocations et tasbih</div>
+                    </div>
+                    <div class="dhikr-container">
+                        <div class="dhikr-display" id="dhikrCount">0</div>
+                        <button class="dhikr-button" onclick="incrementDhikr()">☪</button>
+                        <div style="margin-top: 24px;">
+                            <button class="vision-button" onclick="resetDhikr()">Remettre à zéro</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Duas -->
+            <div id="duas-section" class="section">
+                <div class="glass-card">
+                    <div class="card-header">
+                        <div class="card-title">Duas Quotidiennes</div>
+                        <div class="card-subtitle">Invocations essentielles pour chaque jour</div>
+                    </div>
+                </div>
+                <div class="duas-container" id="duasContainer"></div>
+            </div>
+        </div>
+
+        <div class="tab-bar">
+            <button class="tab-button active" onclick="showSection('prayers')">
+                <div class="tab-icon">🕌</div>
+                <div>Prières</div>
+            </button>
+            <button class="tab-button" onclick="showSection('qibla')">
+                <div class="tab-icon">🧭</div>
+                <div>Qibla</div>
+            </button>
+            <button class="tab-button" onclick="showSection('dhikr')">
+                <div class="tab-icon">📿</div>
+                <div>Dhikr</div>
+            </button>
+            <button class="tab-button" onclick="showSection('duas')">
+                <div class="tab-icon">📖</div>
+                <div>Duas</div>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let currentLocation = { lat: 48.8566, lng: 2.3522 };
+        let dhikrCount = 0;
+
+        const duas = [
+            {
+                arabic: "بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ",
+                translation: "Au nom d'Allah, le Tout Miséricordieux, le Très Miséricordieux"
+            },
+            {
+                arabic: "الْحَمْدُ للهِ رَبِّ الْعَالَمِينَ",
+                translation: "Louange à Allah, Seigneur de l'univers"
+            },
+            {
+                arabic: "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+                translation: "Seigneur ! Accorde-nous belle part ici-bas, et belle part aussi dans l'au-delà, et protège-nous du châtiment du Feu !"
+            },
+            {
+                arabic: "رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي",
+                translation: "Seigneur, dilate-moi la poitrine et facilite-moi ma mission"
+            },
+            {
+                arabic: "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ",
+                translation: "Ô Allah, prie sur Muhammad et sur la famille de Muhammad"
+            },
+            {
+                arabic: "سُبْحَانَ اللهِ وَبِحَمْدِهِ سُبْحَانَ اللهِ الْعَظِيمِ",
+                translation: "Gloire à Allah et louange à Lui, gloire à Allah le Magnifique"
+            },
+            {
+                arabic: "لَا إِلٰهَ إِلَّا اللهُ مُحَمَّدٌ رَسُولُ اللهِ",
+                translation: "Il n'y a de divinité qu'Allah, Muhammad est le Messager d'Allah"
+            },
+            {
+                arabic: "أَسْتَغْفِرُ اللهَ الَّذِي لَا إِلٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ وَأَتُوبُ إِلَيْهِ",
+                translation: "Je demande pardon à Allah, il n'y a de divinité que Lui, le Vivant, Celui qui subsiste par Lui-même, et je me repens à Lui"
+            },
+            {
+                arabic: "اللَّهُمَّ أَعِنِّي عَلَى ذِكْرِكَ وَشُكْرِكَ وَحُس
